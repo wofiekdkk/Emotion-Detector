@@ -1,32 +1,44 @@
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="./static/mywebscript.js"></script>
-    <style>
-        .center-heading {
-            text-align: center;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Emotion Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="card">
-        <div class="card-body">
-            <h1 class="center-heading">NLP - Emotion Detection</h1> 
-            <div style="padding: 25px 25px 25px 25px;">
-            <h2 class="mb-3">
-                <label class="form-label">Please enter the text to be analyzed</label>
-                <input type="textarea" class="form-control" id="textToAnalyze">
-            </h2>
+    <main class="container">
+        <h1>Emotion Detector</h1>
+        <p>Enter a sentence to analyze its emotional tone.</p>
 
-            <div style="padding: 25px 25px 25px 25px;">
-                <button onclick="RunSentimentAnalysis()" class="btn btn-secondary">Run Sentiment Analysis</button>
-            </div>
-            <div style="padding: 25px 25px 25px 25px;"></div>
-            <h2 class="mb-3">
-                <label class="form-label">Result of Emotion Detection</label>
-            </h2>
+        <form action="/emotionDetector" method="post">
+            <label for="textToAnalyze">Text to analyze</label>
+            <textarea id="textToAnalyze" name="textToAnalyze"
+                      rows="5" placeholder="Type your sentence here..."
+                      required>{{ input_text|default('') }}</textarea>
+            <button type="submit">Detect emotion</button>
+        </form>
 
-            <div id="system_response" style="padding: 25px 25px 25px 25px;"></div>
-        </div>
-    </div>
+        {% if error %}
+        <section class="error" role="alert">
+            <h2>Unable to analyze text</h2>
+            <p>{{ error }}</p>
+        </section>
+        {% endif %}
+
+        {% if result %}
+        <section class="results">
+            <h2>Emotion analysis</h2>
+            <p><strong>Dominant emotion:</strong>
+                {{ result.dominant_emotion }}</p>
+            <ul>
+                {% for emotion in ['anger', 'disgust', 'fear', 'joy', 'sadness'] %}
+                <li><strong>{{ emotion|capitalize }}:</strong>
+                    {{ "%.4f"|format(result[emotion]) }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+    </main>
 </body>
+</html>
